@@ -38,7 +38,7 @@ class pretty_printer:
                 if recipient.name == group.name:
                     print("\n{0}".format(recipient.name))
                     for topic in recipient.topics:
-                        print(topic.name)
+                        print("\n{0}".format(topic.name))
                         for entry in topic.entries:
                             print(entry)
             
