@@ -64,17 +64,18 @@ class parser:
                current_topic.entries.append(line)
             elif prefix == 'h1':
                 # replace the recipient
-                if current_recipient != None:
+                if current_recipient != None and current_recipient not in recipients:
                     recipients.append(current_recipient)
                 new_recipient = recipient(line)
                 # use an existing object if it matches
                 # otherwise keep using the new object
                 for r in recipients:
                     if r == new_recipient:
+                        print(r.name)
                         new_recipient = r 
                 current_recipient = new_recipient
             elif prefix == 'h4':
-                if current_topic != None:
+                if current_topic != None and current_topic not in current_recipient.topics:
                     current_recipient.topics.append(current_topic)
                 new_topic = topic(line)
                 for existing_topic in current_recipient.topics:
