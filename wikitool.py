@@ -37,7 +37,7 @@ class pretty_printer:
             for recipient in self.recipients:
                 if recipient.name == group.name:
                     print("\n{0}".format(recipient.name))
-                    for topic in recipient.topics:
+                    for topic in sorted(recipient.topics, key = lambda t: t.name.lower()):
                         print("\n{0}".format(topic.name))
                         for entry in topic.entries:
                             print(entry)
@@ -50,39 +50,54 @@ class pretty_printer:
 
 
 class parser:
+    """ Stateful parser of wiki mails """
+    def __init__(self):
+        self.recipients = []
+        self.current_recipient = None
+        self.current_topic = None
+
+    def add_recipient(self):
+        if self.current_recipient != None and self.current_recipient not in self.recipients:
+            if self.current_topic != None and self.current_topic not in self.current_recipient.topics:
+                self.current_recipient.topics.append(self.current_topic)
+                self.current_topic = None
+            self.recipients.append(self.current_recipient)
+
+    def add_topic(self):
+        if self.current_topic != None and self.current_topic not in self.current_recipient.topics:
+            self.current_recipient.topics.append(self.current_topic)
+
     def parse(self, content):
         """ Parse wiki-formatted content """
         lines = content.split("\n")
-        current_recipient = None
-        current_topic = None
-        recipients = []
+
         for line in lines:
             if len(line) < 2: # invalid line
                 continue
             prefix = line[:2]
             if prefix == '* ': # entry
-               current_topic.entries.append(line)
+               self.current_topic.entries.append(line)
             elif prefix == 'h1':
                 # replace the recipient
-                if current_recipient != None and current_recipient not in recipients:
-                    recipients.append(current_recipient)
+                self.add_recipient()
                 new_recipient = recipient(line)
                 # use an existing object if it matches
                 # otherwise keep using the new object
-                for r in recipients:
+                for r in self.recipients:
                     if r == new_recipient:
-                        print(r.name)
-                        new_recipient = r 
-                current_recipient = new_recipient
+                        new_recipient = r
+                self.current_recipient = new_recipient
             elif prefix == 'h4':
-                if current_topic != None and current_topic not in current_recipient.topics:
-                    current_recipient.topics.append(current_topic)
+                self.add_topic()
                 new_topic = topic(line)
-                for existing_topic in current_recipient.topics:
+                for existing_topic in self.current_recipient.topics:
                     if existing_topic == new_topic:
                         new_topic = existing_topic
-                current_topic = new_topic 
-        return recipients
+                self.current_topic = new_topic
+        # EOF reached, but we might have to append outstanding topics etc
+        self.add_topic()
+        self.add_recipient()
+        return self.recipients
     
 if __name__ == '__main__':
     file = open("mail.txt")
