@@ -99,8 +99,3 @@ class parser:
         self.add_recipient()
         return self.recipients
     
-if __name__ == '__main__':
-    file = open("mail.txt")
-    recipients =  parser().parse(file.read())
-    printer = pretty_printer(recipients)
-    printer.print_wiki()
