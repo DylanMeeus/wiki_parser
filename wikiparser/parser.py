@@ -33,14 +33,16 @@ class pretty_printer:
 
     def print_for_groups(self, groups):
         """ prints the groups in the chosen order"""
+        content = ""
         for group in groups:
             for recipient in self.recipients:
                 if recipient.name == group.name:
-                    print("\n{0}".format(recipient.name))
+                    content += ("\n\n{0}".format(recipient.name))
                     for topic in sorted(recipient.topics, key = lambda t: t.name.lower()):
-                        print("\n{0}".format(topic.name))
+                        content += ("\n\n{0}".format(topic.name))
                         for entry in topic.entries:
-                            print(entry)
+                            content += ("\n{0}".format(entry))
+        return content
             
 
     def print_wiki(self):
