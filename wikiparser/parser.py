@@ -1,4 +1,4 @@
-
+from functools import reduce
 """ tool to manage wiki.txt data for KWS prod/try release mails 
     
     Info
@@ -16,7 +16,7 @@ class topic:
 
 class recipient:
     def __init__(self, name):
-        self.name = name
+        self.name = name.strip()
         self.topics = []
         
     def __eq__(self, other):
@@ -43,7 +43,17 @@ class pretty_printer:
                         for entry in topic.entries:
                             content += ("\n{0}".format(entry))
         return content
-            
+
+    def print_s9(self):
+        """ at the moment they are equal"""
+        return self.print_wiki()
+
+    def print_testers(self):
+        tester_recipients = list(filter(lambda r: r.name != "h1. s9", self.recipients))
+        return self.print_for_groups(tester_recipients)
+
+    def print_users(self):
+        return self.print_for_groups([recipient("h1. g")])
 
     def print_wiki(self):
         """ prints wiki output"""
