@@ -8,11 +8,11 @@ from functools import reduce
 
 class topic:
     def __init__(self, name):
-        self.name = name
+        self.name = name.strip()
         self.entries = []
         
     def __eq__(self, other):
-        return other != None and self.name == other.name
+        return other != None and self.name.lower() == other.name.lower()
 
 class recipient:
     def __init__(self, name):
@@ -20,7 +20,7 @@ class recipient:
         self.topics = []
         
     def __eq__(self, other):
-        return other != None and self.name == other.name
+        return other != None and self.name.lower() == other.name.lower()
     
     def __hash__(self):
         return hash(self.name)
@@ -36,7 +36,7 @@ class pretty_printer:
         content = ""
         for group in groups:
             for recipient in self.recipients:
-                if recipient.name == group.name:
+                if recipient == group:
                     content += ("\n\n{0}".format(recipient.name))
                     for topic in sorted(recipient.topics, key = lambda t: t.name.lower()):
                         content += ("\n\n{0}".format(topic.name))
@@ -70,14 +70,13 @@ class parser:
 
     def add_recipient(self):
         if self.current_recipient != None and self.current_recipient not in self.recipients:
-            if self.current_topic != None and self.current_topic not in self.current_recipient.topics:
-                self.current_recipient.topics.append(self.current_topic)
-                self.current_topic = None
             self.recipients.append(self.current_recipient)
+        self.current_recipient = None
 
     def add_topic(self):
         if self.current_topic != None and self.current_topic not in self.current_recipient.topics:
             self.current_recipient.topics.append(self.current_topic)
+        self.current_topic = None
 
     def parse(self, content):
         """ Parse wiki-formatted content """
@@ -88,9 +87,10 @@ class parser:
                 continue
             prefix = line[:2]
             if prefix == '* ': # entry
-               self.current_topic.entries.append(line)
+                self.current_topic.entries.append(line)
             elif prefix == 'h1':
                 # replace the recipient
+                self.add_topic()
                 self.add_recipient()
                 new_recipient = recipient(line)
                 # use an existing object if it matches
@@ -98,6 +98,7 @@ class parser:
                 for r in self.recipients:
                     if r == new_recipient:
                         new_recipient = r
+                        break
                 self.current_recipient = new_recipient
             elif prefix == 'h4':
                 self.add_topic()
@@ -105,6 +106,7 @@ class parser:
                 for existing_topic in self.current_recipient.topics:
                     if existing_topic == new_topic:
                         new_topic = existing_topic
+                        break
                 self.current_topic = new_topic
         # EOF reached, but we might have to append outstanding topics etc
         self.add_topic()
