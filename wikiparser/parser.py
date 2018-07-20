@@ -37,9 +37,9 @@ class pretty_printer:
         for group in groups:
             for recipient in self.recipients:
                 if recipient == group:
-                    content += ("\n\n<h1>{0}</h1>".format(recipient.name))
+                    content += ("\n\n<h1>{0}</h1>".format(recipient.name[3:]))
                     for topic in sorted(recipient.topics, key = lambda t: t.name.lower()):
-                        content += ("\n\n<h4>{0}</h4>".format(topic.name))
+                        content += ("\n\n<h4>{0}</h4>".format(topic.name[3:]))
                         content += "\n<ul>"
                         for entry in topic.entries:
                             content += ("\n<li>{0}</li>".format(entry[2:]))
