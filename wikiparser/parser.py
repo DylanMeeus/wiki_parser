@@ -33,15 +33,18 @@ class pretty_printer:
 
     def print_for_groups(self, groups):
         """ prints the groups in the chosen order"""
-        content = ""
+        content = "<html><body>"
         for group in groups:
             for recipient in self.recipients:
                 if recipient == group:
-                    content += ("\n\n{0}".format(recipient.name))
+                    content += ("\n\n<h1>{0}</h1>".format(recipient.name))
                     for topic in sorted(recipient.topics, key = lambda t: t.name.lower()):
-                        content += ("\n\n{0}".format(topic.name))
+                        content += ("\n\n<h4>{0}</h4>".format(topic.name))
+                        content += "\n<ul>"
                         for entry in topic.entries:
-                            content += ("\n{0}".format(entry))
+                            content += ("\n<li>{0}</li>".format(entry[2:]))
+                        content += "</ul>"
+        content += "</body></html>"
         return content
 
     def print_s9(self):
