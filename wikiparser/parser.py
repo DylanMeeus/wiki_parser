@@ -31,6 +31,21 @@ class pretty_printer:
     def __init__(self, recipients):
         self.recipients = recipients
 
+    def format_content(self, content):
+        """ formats the content in the entry """
+        if "jira.uz.kuleuven.ac.be" in content:
+            # format as URL
+            main_tag = content[:content.find("]")+1]
+            second_tag = content[len(main_tag):content[len(main_tag):].find("]")+len(main_tag)]
+            url_parts = second_tag[2:].split("|")
+            url = "<a href={0}>{1}</a>".format(url_parts[1], url_parts[0])
+
+            # Also add the remainder of the content outside of the tags
+            remainder = content[len(main_tag)+len(second_tag)+2:]
+            content = main_tag + "[{0}]".format(url) + remainder
+        return content
+
+
     def print_for_groups(self, groups):
         """ prints the groups in the chosen order"""
         content = "<html><body>"
@@ -43,7 +58,7 @@ class pretty_printer:
                             continue
                         content += ("\n\n<h4>{0}</h4>".format(topic.name[3:]))
                         for entry in topic.entries:
-                            content += ("\n{0}<br/>".format(entry[2:].replace("\\","")))
+                            content += ("\n{0}<br/>".format(self.format_content(entry[2:].replace("\\",""))))
         content += "</body></html>"
         return content
 
