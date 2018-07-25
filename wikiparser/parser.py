@@ -39,6 +39,8 @@ class pretty_printer:
                 if recipient == group:
                     content += ("\n\n<h1>{0}</h1><hr>".format(recipient.name[3:]))
                     for topic in sorted(recipient.topics, key = lambda t: t.name.lower()):
+                        if "losse commentaren" in topic.name:
+                            continue
                         content += ("\n\n<h4>{0}</h4>".format(topic.name[3:]))
                         for entry in topic.entries:
                             content += ("\n{0}<br/>".format(entry[2:].replace("\\","")))
