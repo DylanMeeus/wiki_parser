@@ -57,8 +57,10 @@ class pretty_printer:
                         if "losse commentaren" in topic.name:
                             continue
                         content += ("\n\n<h4>{0}</h4>".format(topic.name[3:]))
+                        content += "<ul>"
                         for entry in topic.entries:
-                            content += ("\n{0}<br/>".format(self.format_content(entry[2:].replace("\\",""))))
+                            content += ("\n<li>{0}</li><br/>".format(self.format_content(entry[2:].replace("\\",""))))
+                        content += "</ul>"
         content += "</body></html>"
         return content
 
